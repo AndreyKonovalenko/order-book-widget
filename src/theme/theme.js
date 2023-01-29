@@ -1,12 +1,12 @@
 const theme = {
   colors: {
     buy: '#72ED93',
-    sell: '#E08AAFF',
+    buyProgressBar: '#36513D',
+    sell: '#E08AFF',
+    sellProgressBar: '#2D0026',
     text: {
-      text: {
-        main: '#FFFFFFF',
-        secondary: '#9D9D9d',
-      },
+      main: '#FFFFFF',
+      secondary: '#9D9D9d',
     },
   },
   fonts: {
@@ -26,6 +26,10 @@ const theme = {
       lastSell: {
         head: '16px',
         data: '30px',
+      },
+      link: {
+        desktop: '19px',
+        mobile: '16px',
       },
     },
   },
