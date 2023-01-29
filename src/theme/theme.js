@@ -15,10 +15,7 @@ const theme = {
       secondary: 'Raleway',
     },
     size: {
-      head: {
-        head1: '22px',
-        head2: '19px',
-      },
+      head: '19px',
       dataContainer: {
         head: '14px',
         data: '19px',

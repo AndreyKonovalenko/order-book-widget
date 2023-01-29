@@ -2,9 +2,8 @@ const OrderBook = (props) => {
   const { children, isMobile } = props;
   const styles = {
     orderBook: {
-      display: 'felx',
+      display: 'flex',
       flexDirection: 'column',
-      padding: '15px',
       gap: '10px',
       position: 'absolute',
       width: '342px',
