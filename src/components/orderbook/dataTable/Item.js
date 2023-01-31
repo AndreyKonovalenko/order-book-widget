@@ -6,14 +6,14 @@ const Item = (props) => {
   const styles = {
     container: {
       display: "flex",
-      width: "146px",
-      heiht: "19px",
       flexDirection: "row",
       justifyContent: "space-between",
-      backdropFilter: "blur(10px)",
+      alignItems: "center",
+      width: "146px",
+      padding: "2px  0px",
       background: `linear-gradient(to right, ${
         isAsk ? colors.buyProgressBar : colors.sellProgressBar
-      } ${barLength}%, rgba(0, 0, 0, 0.7) 0%)`,
+      } ${barLength}%, rgba(0, 0, 0, 0) 0%)`,
     },
     price: {
       fontFamily: fonts.family.main,
@@ -21,6 +21,7 @@ const Item = (props) => {
       fontStyle: "normal",
       fontSize: fonts.size.dataContainer.data,
       color: isAsk ? colors.buy : colors.sell,
+      lineHieght: "120%",
     },
     amaunt: {
       fontFamily: fonts.family.main,
@@ -28,6 +29,7 @@ const Item = (props) => {
       fontStyle: "normal",
       fontSize: fonts.size.dataContainer.data,
       color: colors.text.main,
+      lineHieght: "120%",
     },
   };
   return (
