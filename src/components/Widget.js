@@ -18,26 +18,38 @@ const Widget = () => {
   const dispatch = useDispatch();
   const { snapshot } = useSelector((state) => state.orderBook);
   const { isMobile, isLandscape, isMobileDevice } = useDeviceDetect();
+  const [lustSell, setLustSell] = useState(0);
 
   const socketUrl = 'wss://stream.binance.com:9443/ws/btcusdt@depth';
 
-  // const { sendJsonMessage, getWebSocket } = useWebSocket(socketUrl, {
+  // const depth = useWebSocket(socketUrl, {
   //   onOpen: () => console.log('opened'),
   //   onClose: () => console.log('WebSocket connection closed.'),
   //   shouldReconnect: (closeEvent) => true,
   //   onMessage: (event) => processMessages(event),
   // });
 
-  // const processMessages = (event) => {
-  //   const response = JSON.parse(event.data);
-  //   process(response);
-  //   console.log(process(response));
-  //   // if (response.numLevels) {
-  //   //   dispatch(addExistingState(response));
-  //   // } else {
-  //   //   process(response);
-  //   // }
-  // };
+  const candlestickStream = useWebSocket(
+    'wss://stream.binance.com:9443/ws/btcusdt@kline_1s',
+    {
+      onOpen: () => console.log('opened'),
+      onClose: () => console.log('WebSocket connection closed.'),
+      shouldReconnect: (closeEvent) => true,
+      onMessage: (event) => processMessages(event),
+    }
+  );
+  const processMessages = (event) => {
+    const response = JSON.parse(event.data);
+    if (response.e === 'kline') {
+      setLustSell(response.k.c);
+    }
+
+    // if (response.numLevels) {
+    //   dispatch(addExistingState(response));
+    // } else {
+    //   process(response);
+    // }
+  };
 
   // const process = (data) => {
   //   return data;
@@ -118,7 +130,7 @@ const Widget = () => {
           </ColumnContainer>
           <Line />
         </DataTable>
-        <LastSell value={'21,256.13'} />
+        <LastSell value={lustSell} />
       </OrderBook>
     </Layout>
   );
