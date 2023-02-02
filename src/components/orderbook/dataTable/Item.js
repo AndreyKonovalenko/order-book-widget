@@ -1,34 +1,34 @@
-import theme from '../../../theme/theme';
+import theme from "../../../theme/theme";
 const Item = (props) => {
   const { colors, fonts } = theme;
   const { price, amount, isAsk, barLength } = props;
 
   const styles = {
     container: {
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      width: '146px',
-      padding: '2px  0px',
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "146px",
+      padding: "2px  0px",
       background: `linear-gradient(to right, ${
-        isAsk ? colors.buyProgressBar : colors.sellProgressBar
+        isAsk ? colors.sellProgressBar : colors.buyProgressBar
       } ${barLength}%, rgba(0, 0, 0, 0) 0%)`,
-      lineHeight: '120%',
+      lineHeight: "120%",
     },
     price: {
       fontFamily: fonts.family.main,
-      fontWeight: '400',
-      fontStyle: 'normal',
+      fontWeight: "400",
+      fontStyle: "normal",
       fontSize: fonts.size.dataContainer.data,
-      color: isAsk ? colors.buy : colors.sell,
-      lineHeight: '120%',
-      paddingLeft: '2px',
+      color: isAsk ? colors.sell : colors.buy,
+      lineHeight: "120%",
+      paddingLeft: "2px",
     },
     amaunt: {
       fontFamily: fonts.family.main,
-      fontWeight: '400',
-      fontStyle: 'normal',
+      fontWeight: "400",
+      fontStyle: "normal",
       fontSize: fonts.size.dataContainer.data,
       color: colors.text.main,
     },
