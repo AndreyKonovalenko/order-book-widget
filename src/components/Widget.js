@@ -15,6 +15,8 @@ import Item from "./orderbook/dataTable/Item";
 
 import { getSnapshot } from "../fetures/orderBook/orderBookSlice";
 
+import { formatToCurrency, findMax } from "../utils/utils";
+
 const Widget = () => {
   const dispatch = useDispatch();
   const { snapshot } = useSelector((state) => state.orderBook);
@@ -57,24 +59,19 @@ const Widget = () => {
   // };
   // const socket = getWebSocket();
 
-  const findMax = (arr) => {
-    const amountArr = arr.map((element) => parseFloat(element[1]));
-    return Math.max(...amountArr);
-  };
-
   const bids = snapshot !== null ? snapshot.bids.slice(0, 7) : null;
   const bidsTable =
     bids !== null
       ? bids.map((element) => {
-          const price = parseFloat(element[0]).toFixed(2);
-          const amount = parseFloat(element[1]).toFixed(5);
+          const price = parseFloat(element[0]);
+          const amount = parseFloat(element[1]);
           const max = findMax(bids);
           const barLength = (amount / max) * 100;
           return (
             <Item
               key={uniqid()}
-              price={price}
-              amount={amount}
+              price={formatToCurrency(price)}
+              amount={amount.toFixed(5)}
               isAsk={false}
               barLength={barLength < 1 ? 1 : barLength}
             />
@@ -86,15 +83,15 @@ const Widget = () => {
   const asksTable =
     asks !== null
       ? asks.map((element) => {
-          const price = parseFloat(element[0]).toFixed(2);
-          const amount = parseFloat(element[1]).toFixed(5);
+          const price = parseFloat(element[0]);
+          const amount = parseFloat(element[1]);
           const max = findMax(asks);
           const barLength = (amount / max) * 100;
           return (
             <Item
               key={uniqid()}
-              price={price}
-              amount={amount}
+              price={formatToCurrency(price)}
+              amount={amount.toFixed(5)}
               isAsk={true}
               barLength={barLength < 1 ? 1 : barLength}
             />
@@ -103,11 +100,10 @@ const Widget = () => {
       : null;
 
   useEffect(() => {
-    console.log(bids);
-
     if (snapshot === null) {
       dispatch(getSnapshot());
     }
+
     // console.log(socket.bufferedAmount);
     // const subscribeMessage = {};
     // sendJsonMessage(subscribeMessage);
@@ -128,7 +124,7 @@ const Widget = () => {
           </ColumnContainer>
           <Line />
         </DataTable>
-        <LastSell value={lustSell} />
+        <LastSell value={formatToCurrency(parseFloat(lustSell))} />
       </OrderBook>
     </Layout>
   );
