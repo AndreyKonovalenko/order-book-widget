@@ -23,16 +23,14 @@ const Widget = () => {
   const { isMobile, isLandscape, isMobileDevice } = useDeviceDetect();
   const { bids, asks, lastUpdateId } = useSelector((state) => state.orderbook);
   const { closePrice } = useSelector((state) => state.closePrice);
-  const [lustSell, setLustSell] = useState(0);
-
   const socketUrl = "wss://stream.binance.com:9443/ws/btcusdt@depth";
 
-  // const depth = useWebSocket(socketUrl, {
-  //   onOpen: () => console.log("opened"),
-  //   onClose: () => console.log("WebSocket connection closed."),
-  //   shouldReconnect: (closeEvent) => true,
-  //   onMessage: (event) => processMessages(event),
-  // });
+  const depth = useWebSocket(socketUrl, {
+    onOpen: () => console.log("opened"),
+    onClose: () => console.log("WebSocket connection closed."),
+    shouldReconnect: (closeEvent) => true,
+    onMessage: (event) => processMessages(event),
+  });
 
   const candlestickStream = useWebSocket(
     "wss://stream.binance.com:9443/ws/btcusdt@kline_1s",
@@ -90,6 +88,8 @@ const Widget = () => {
     if (lastUpdateId === 0) {
       dispatch(getSnapshot());
     }
+    console.log(depth.getWebSocket());
+    console.log(candlestickStream.getWebSocket());
     // const subscribeMessage = {};
     // sendJsonMessage(subscribeMessage);
   }, [dispatch]);
@@ -117,3 +117,14 @@ const Widget = () => {
 };
 
 export default Widget;
+
+// function createConnectionAndPingServer(key) {
+//   serverList[key].socket = new WebSocket(serverList[key].url + "?" + serverOpts.query);
+
+//   addSocketMethods(serverList[key].socket);
+//   receivePingHandler(key);
+
+//   serverList[key].socket.onopen = function() {
+//       serverList[key].socket.emit('ping_from_client', Date.now());
+//   };
+// }
