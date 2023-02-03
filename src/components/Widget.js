@@ -17,34 +17,25 @@ import { getSnapshot } from "../fetures/orderbook/orderbookSlice";
 import { setClosePrice } from "../fetures/closePrice/closePriceSlice";
 
 import { formatToCurrency, findMax } from "../utils/utils";
+const endpoint = "wss://stream.binance.com:9443/stream?streams=";
 
 const Widget = () => {
   const dispatch = useDispatch();
-  const { isMobile, isLandscape, isMobileDevice } = useDeviceDetect();
-  const { bids, asks, lastUpdateId } = useSelector((state) => state.orderbook);
-  const { closePrice } = useSelector((state) => state.closePrice);
-  const socketUrl = "wss://stream.binance.com:9443/ws/btcusdt@depth";
-
-  const depth = useWebSocket(socketUrl, {
+  const options = {
     onOpen: () => console.log("opened"),
     onClose: () => console.log("WebSocket connection closed."),
     shouldReconnect: (closeEvent) => true,
     onMessage: (event) => processMessages(event),
-  });
+  };
+  const { isMobile, isLandscape, isMobileDevice } = useDeviceDetect();
+  const { bids, asks, lastUpdateId } = useSelector((state) => state.orderbook);
+  const { closePrice } = useSelector((state) => state.closePrice);
+  const { sendJsonMessage, getWebSocket } = useWebSocket(endpoint, options);
 
-  const candlestickStream = useWebSocket(
-    "wss://stream.binance.com:9443/ws/btcusdt@kline_1s",
-    {
-      onOpen: () => console.log("opened"),
-      onClose: () => console.log("WebSocket connection closed."),
-      shouldReconnect: (closeEvent) => true,
-      onMessage: (event) => processMessages(event),
-    }
-  );
   const processMessages = (event) => {
     const response = JSON.parse(event.data);
-    if (response.e === "kline") {
-      dispatch(setClosePrice(response.k.c));
+    if (response.stream === "btcusdt@kline_1s") {
+      dispatch(setClosePrice(response.data.k.c));
     }
     // if (response.e === "depthUpdate") {
     //   console.log(response);
@@ -85,13 +76,25 @@ const Widget = () => {
   const asksTable = asks !== null ? columnConstructor(asks, true) : null;
 
   useEffect(() => {
+    const connect = () => {
+      // const unSubscribeMessage = {
+      //   method: "UNSUBSCRIBE",
+      //   params: ["btcusdt@depth", "btcusdt@kline_1s"],
+      //   id: 312,
+      // };
+      // sendJsonMessage(unSubscribeMessage);
+
+      const subscribeMessage = {
+        method: "SUBSCRIBE",
+        params: ["btcusdt@depth", "btcusdt@kline_1s"],
+        id: 1,
+      };
+      sendJsonMessage(subscribeMessage);
+    };
+    connect();
     if (lastUpdateId === 0) {
       dispatch(getSnapshot());
     }
-    console.log(depth.getWebSocket());
-    console.log(candlestickStream.getWebSocket());
-    // const subscribeMessage = {};
-    // sendJsonMessage(subscribeMessage);
   }, [dispatch]);
 
   const widget = (
@@ -117,14 +120,3 @@ const Widget = () => {
 };
 
 export default Widget;
-
-// function createConnectionAndPingServer(key) {
-//   serverList[key].socket = new WebSocket(serverList[key].url + "?" + serverOpts.query);
-
-//   addSocketMethods(serverList[key].socket);
-//   receivePingHandler(key);
-
-//   serverList[key].socket.onopen = function() {
-//       serverList[key].socket.emit('ping_from_client', Date.now());
-//   };
-// }
