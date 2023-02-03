@@ -1,19 +1,19 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import orderBookService from './orderBookService';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import orderbookService from "./orderbookService";
 
 const initialState = {
-  snapshot: null,
+  lastUpdateId: 0,
+  bids: null,
+  asks: null,
   isError: false,
   isSuccess: false,
   isLoading: false,
-  message: '',
-  rawBids: [],
-  rawAsks: [],
+  message: "",
 };
 
-export const getSnapshot = createAsyncThunk('getSnapshot', async (thunkAPI) => {
+export const getSnapshot = createAsyncThunk("getSnapshot", async (thunkAPI) => {
   try {
-    return await orderBookService.getSnapshot();
+    return await orderbookService.getSnapshot();
   } catch (error) {
     const message =
       (error.response && error.response.data && error.response.data.message) ||
@@ -23,10 +23,10 @@ export const getSnapshot = createAsyncThunk('getSnapshot', async (thunkAPI) => {
   }
 });
 
-export const orderBookSlice = createSlice({
-  name: 'orderBook',
+export const orderbookSlice = createSlice({
+  name: "orderbook",
   initialState,
-  reducers: { resetOrderBookState: () => initialState },
+  reducers: { resetOrderbookState: () => initialState },
   extraReducers: (builder) => {
     builder
       .addCase(getSnapshot.pending, (state) => {
@@ -35,14 +35,18 @@ export const orderBookSlice = createSlice({
       .addCase(getSnapshot.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.snapshot = action.payload;
+        state.lastUpdateId = action.payload.lastUpdateId;
+        state.bids = action.payload.bids;
+        state.asks = action.payload.asks;
       })
+
       .addCase(getSnapshot.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
-        state.snapshot = {};
       });
   },
 });
-export default orderBookSlice.reducer;
+
+export const { resetOrderbookState } = orderbookSlice.actions;
+export default orderbookSlice.reducer;

@@ -13,21 +13,23 @@ import OrderBook from "./orderbook/OrderBook";
 import Line from "./orderbook/dataTable/Line";
 import Item from "./orderbook/dataTable/Item";
 
-import { getSnapshot } from "../fetures/orderBook/orderBookSlice";
+import { getSnapshot } from "../fetures/orderbook/orderbookSlice";
+import { setClosePrice } from "../fetures/closePrice/closePriceSlice";
 
 import { formatToCurrency, findMax } from "../utils/utils";
 
 const Widget = () => {
   const dispatch = useDispatch();
-  const { snapshot } = useSelector((state) => state.orderBook);
   const { isMobile, isLandscape, isMobileDevice } = useDeviceDetect();
+  const { bids, asks, lastUpdateId } = useSelector((state) => state.orderbook);
+  const { closePrice } = useSelector((state) => state.closePrice);
   const [lustSell, setLustSell] = useState(0);
 
   const socketUrl = "wss://stream.binance.com:9443/ws/btcusdt@depth";
 
   // const depth = useWebSocket(socketUrl, {
-  //   onOpen: () => console.log('opened'),
-  //   onClose: () => console.log('WebSocket connection closed.'),
+  //   onOpen: () => console.log("opened"),
+  //   onClose: () => console.log("WebSocket connection closed."),
   //   shouldReconnect: (closeEvent) => true,
   //   onMessage: (event) => processMessages(event),
   // });
@@ -44,8 +46,11 @@ const Widget = () => {
   const processMessages = (event) => {
     const response = JSON.parse(event.data);
     if (response.e === "kline") {
-      setLustSell(response.k.c);
+      dispatch(setClosePrice(response.k.c));
     }
+    // if (response.e === "depthUpdate") {
+    //   console.log(response);
+    // }
 
     // if (response.numLevels) {
     //   dispatch(addExistingState(response));
@@ -59,55 +64,35 @@ const Widget = () => {
   // };
   // const socket = getWebSocket();
 
-  const bids = snapshot !== null ? snapshot.bids.slice(0, 7) : null;
-  const bidsTable =
-    bids !== null
-      ? bids.map((element) => {
-          const price = parseFloat(element[0]);
-          const amount = parseFloat(element[1]);
-          const max = findMax(bids);
-          const barLength = (amount / max) * 100;
-          return (
-            <Item
-              key={uniqid()}
-              price={formatToCurrency(price)}
-              amount={amount.toFixed(5)}
-              isAsk={false}
-              barLength={barLength < 1 ? 1 : barLength}
-            />
-          );
-        })
-      : null;
+  const columnConstructor = (arr, type) => {
+    const slicedArr = arr.slice(0, 7);
+    return slicedArr.map((element) => {
+      const price = parseFloat(element[0]);
+      const amount = parseFloat(element[1]);
+      const max = findMax(slicedArr);
+      const barLength = (amount / max) * 100;
+      return (
+        <Item
+          key={uniqid()}
+          price={formatToCurrency(price)}
+          amount={amount.toFixed(5)}
+          isAsk={type}
+          barLength={barLength < 1 ? 1 : barLength}
+        />
+      );
+    });
+  };
 
-  const asks = snapshot !== null ? snapshot.asks.slice(0, 7) : null;
-  const asksTable =
-    asks !== null
-      ? asks.map((element) => {
-          const price = parseFloat(element[0]);
-          const amount = parseFloat(element[1]);
-          const max = findMax(asks);
-          const barLength = (amount / max) * 100;
-          return (
-            <Item
-              key={uniqid()}
-              price={formatToCurrency(price)}
-              amount={amount.toFixed(5)}
-              isAsk={true}
-              barLength={barLength < 1 ? 1 : barLength}
-            />
-          );
-        })
-      : null;
+  const bidsTable = bids !== null ? columnConstructor(bids, false) : null;
+  const asksTable = asks !== null ? columnConstructor(asks, true) : null;
 
   useEffect(() => {
-    if (snapshot === null) {
+    if (lastUpdateId === 0) {
       dispatch(getSnapshot());
     }
-
-    // console.log(socket.bufferedAmount);
     // const subscribeMessage = {};
     // sendJsonMessage(subscribeMessage);
-  }, [dispatch, snapshot]);
+  }, [dispatch]);
 
   const widget = (
     <Layout
@@ -124,7 +109,7 @@ const Widget = () => {
           </ColumnContainer>
           <Line />
         </DataTable>
-        <LastSell value={formatToCurrency(parseFloat(lustSell))} />
+        <LastSell value={closePrice} />
       </OrderBook>
     </Layout>
   );

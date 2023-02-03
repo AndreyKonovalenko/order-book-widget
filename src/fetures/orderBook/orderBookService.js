@@ -7,8 +7,8 @@ const getSnapshot = async () => {
   return response.data;
 };
 
-const orderBookService = {
+const orderbookService = {
   getSnapshot,
 };
 
-export default orderBookService;
+export default orderbookService;
