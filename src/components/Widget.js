@@ -75,15 +75,16 @@ const Widget = () => {
   const bidsTable = bids !== null ? columnConstructor(bids, false) : null;
   const asksTable = asks !== null ? columnConstructor(asks, true) : null;
 
+  const disconnect = () => {
+    const unSubscribeMessage = {
+      method: "UNSUBSCRIBE",
+      params: ["btcusdt@depth", "btcusdt@kline_1s"],
+      id: 312,
+    };
+    sendJsonMessage(unSubscribeMessage);
+  };
   useEffect(() => {
     const connect = () => {
-      // const unSubscribeMessage = {
-      //   method: "UNSUBSCRIBE",
-      //   params: ["btcusdt@depth", "btcusdt@kline_1s"],
-      //   id: 312,
-      // };
-      // sendJsonMessage(unSubscribeMessage);
-
       const subscribeMessage = {
         method: "SUBSCRIBE",
         params: ["btcusdt@depth", "btcusdt@kline_1s"],
@@ -91,11 +92,15 @@ const Widget = () => {
       };
       sendJsonMessage(subscribeMessage);
     };
+
+    console.log("re-render");
     connect();
     if (lastUpdateId === 0) {
       dispatch(getSnapshot());
+      //need to handle ERR_CONNECTION_TIMED_OUT
     }
-  }, [dispatch]);
+    // return () => disconnect();
+  }, [dispatch, lastUpdateId]);
 
   const widget = (
     <Layout
