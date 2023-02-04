@@ -1,40 +1,42 @@
-import React, { useState, useCallback, useEffect } from "react";
-import useWebSocket, { ReadyState } from "react-use-websocket";
-import { useSelector, useDispatch } from "react-redux";
-import uniqid from "uniqid";
-import useDeviceDetect from "../hooks/useDeviceDetect";
-import Header from "./orderbook/Header";
-import Layout from "./Layout";
-import LastSell from "./orderbook/dataTable/LastSell";
-import ColumnContainer from "./orderbook/dataTable/ColumnContainer";
-import Column from "./orderbook/dataTable/Column";
-import DataTable from "./orderbook/dataTable/DataTable";
-import OrderBook from "./orderbook/OrderBook";
-import Line from "./orderbook/dataTable/Line";
-import Item from "./orderbook/dataTable/Item";
+import React, { useState, useCallback, useEffect } from 'react';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { useSelector, useDispatch } from 'react-redux';
+import uniqid from 'uniqid';
+import useDeviceDetect from '../hooks/useDeviceDetect';
+import Header from './orderbook/Header';
+import Layout from './Layout';
+import LastSell from './orderbook/dataTable/LastSell';
+import ColumnContainer from './orderbook/dataTable/ColumnContainer';
+import Column from './orderbook/dataTable/Column';
+import DataTable from './orderbook/dataTable/DataTable';
+import OrderBook from './orderbook/OrderBook';
+import Line from './orderbook/dataTable/Line';
+import Item from './orderbook/dataTable/Item';
 
-import { getSnapshot } from "../fetures/orderbook/orderbookSlice";
-import { setClosePrice } from "../fetures/closePrice/closePriceSlice";
+import { getSnapshot } from '../fetures/orderbook/orderbookSlice';
+import { setClosePrice } from '../fetures/closePrice/closePriceSlice';
 
-import { formatToCurrency, findMax } from "../utils/utils";
-const endpoint = "wss://stream.binance.com:9443/stream?streams=";
+import { formatToCurrency, findMax } from '../utils/utils';
+const endpoint = 'wss://stream.binance.com:9443/stream?streams=';
 
 const Widget = () => {
   const dispatch = useDispatch();
   const options = {
-    onOpen: () => console.log("opened"),
-    onClose: () => console.log("WebSocket connection closed."),
+    onOpen: () => console.log('opened'),
+    onClose: () => console.log('WebSocket connection closed.'),
     shouldReconnect: (closeEvent) => true,
     onMessage: (event) => processMessages(event),
   };
   const { isMobile, isLandscape, isMobileDevice } = useDeviceDetect();
-  const { bids, asks, lastUpdateId } = useSelector((state) => state.orderbook);
+  const { bids, asks, isLoading, lastUpdateId } = useSelector(
+    (state) => state.orderbook
+  );
   const { closePrice } = useSelector((state) => state.closePrice);
   const { sendJsonMessage, getWebSocket } = useWebSocket(endpoint, options);
 
   const processMessages = (event) => {
     const response = JSON.parse(event.data);
-    if (response.stream === "btcusdt@kline_1s") {
+    if (response.stream === 'btcusdt@kline_1s') {
       dispatch(setClosePrice(response.data.k.c));
     }
     // if (response.e === "depthUpdate") {
@@ -77,37 +79,37 @@ const Widget = () => {
 
   const disconnect = () => {
     const unSubscribeMessage = {
-      method: "UNSUBSCRIBE",
-      params: ["btcusdt@depth", "btcusdt@kline_1s"],
+      method: 'UNSUBSCRIBE',
+      params: ['btcusdt@depth', 'btcusdt@kline_1s'],
       id: 312,
     };
     sendJsonMessage(unSubscribeMessage);
   };
   useEffect(() => {
     const connect = () => {
+      console.log('connect funciton');
       const subscribeMessage = {
-        method: "SUBSCRIBE",
-        params: ["btcusdt@depth", "btcusdt@kline_1s"],
+        method: 'SUBSCRIBE',
+        params: ['btcusdt@depth', 'btcusdt@kline_1s'],
         id: 1,
       };
       sendJsonMessage(subscribeMessage);
     };
 
-    console.log("re-render");
     connect();
-    if (lastUpdateId === 0) {
+    if (lastUpdateId === 0 && isLoading === false) {
+      console.log('getSnapshot');
       dispatch(getSnapshot());
       //need to handle ERR_CONNECTION_TIMED_OUT
     }
-    // return () => disconnect();
-  }, [dispatch, lastUpdateId]);
+    return () => console.log('unmount');
+  }, [dispatch, isLoading, lastUpdateId, sendJsonMessage]);
 
   const widget = (
     <Layout
       isMobile={isMobile}
       isLandscape={isLandscape}
-      isMobileDevice={isMobileDevice}
-    >
+      isMobileDevice={isMobileDevice}>
       <OrderBook isMobile={isMobile}>
         <Header />
         <DataTable>

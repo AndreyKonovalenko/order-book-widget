@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import orderbookService from "./orderbookService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import orderbookService from './orderbookService';
 
 const initialState = {
   lastUpdateId: 0,
@@ -8,10 +8,10 @@ const initialState = {
   isError: false,
   isSuccess: false,
   isLoading: false,
-  message: "",
+  message: '',
 };
 
-export const getSnapshot = createAsyncThunk("getSnapshot", async (thunkAPI) => {
+export const getSnapshot = createAsyncThunk('getSnapshot', async (thunkAPI) => {
   try {
     return await orderbookService.getSnapshot();
   } catch (error) {
@@ -24,7 +24,7 @@ export const getSnapshot = createAsyncThunk("getSnapshot", async (thunkAPI) => {
 });
 
 export const orderbookSlice = createSlice({
-  name: "orderbook",
+  name: 'orderbook',
   initialState,
   reducers: { resetOrderbookState: () => initialState },
   extraReducers: (builder) => {
