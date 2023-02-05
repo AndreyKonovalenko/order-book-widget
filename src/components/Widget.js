@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import React, { useEffect } from 'react';
+import useWebSocket from 'react-use-websocket';
 import { useSelector, useDispatch } from 'react-redux';
 import uniqid from 'uniqid';
 import useDeviceDetect from '../hooks/useDeviceDetect';
@@ -15,8 +15,8 @@ import Item from './orderbook/dataTable/Item';
 
 import { getSnapshot } from '../fetures/orderbook/orderbookSlice';
 import { setClosePrice } from '../fetures/closePrice/closePriceSlice';
-
 import { formatToCurrency, findMax } from '../utils/utils';
+
 const endpoint = 'wss://stream.binance.com:9443/stream?streams=';
 
 const Widget = () => {
@@ -32,28 +32,17 @@ const Widget = () => {
     (state) => state.orderbook
   );
   const { closePrice } = useSelector((state) => state.closePrice);
-  const { sendJsonMessage, getWebSocket } = useWebSocket(endpoint, options);
+  const { sendJsonMessage, getWebSocket, readyState } = useWebSocket(
+    endpoint,
+    options
+  );
 
   const processMessages = (event) => {
     const response = JSON.parse(event.data);
     if (response.stream === 'btcusdt@kline_1s') {
       dispatch(setClosePrice(response.data.k.c));
     }
-    // if (response.e === "depthUpdate") {
-    //   console.log(response);
-    // }
-
-    // if (response.numLevels) {
-    //   dispatch(addExistingState(response));
-    // } else {
-    //   process(response);
-    // }
   };
-
-  // const process = (data) => {
-  //   return data;
-  // };
-  // const socket = getWebSocket();
 
   const columnConstructor = (arr, type) => {
     const slicedArr = arr.slice(0, 7);
@@ -77,17 +66,8 @@ const Widget = () => {
   const bidsTable = bids !== null ? columnConstructor(bids, false) : null;
   const asksTable = asks !== null ? columnConstructor(asks, true) : null;
 
-  const disconnect = () => {
-    const unSubscribeMessage = {
-      method: 'UNSUBSCRIBE',
-      params: ['btcusdt@depth', 'btcusdt@kline_1s'],
-      id: 312,
-    };
-    sendJsonMessage(unSubscribeMessage);
-  };
   useEffect(() => {
     const connect = () => {
-      console.log('connect funciton');
       const subscribeMessage = {
         method: 'SUBSCRIBE',
         params: ['btcusdt@depth', 'btcusdt@kline_1s'],
@@ -95,15 +75,23 @@ const Widget = () => {
       };
       sendJsonMessage(subscribeMessage);
     };
-
-    connect();
+    if (getWebSocket() !== null) {
+      if (readyState !== 0) {
+        connect();
+      }
+    }
     if (lastUpdateId === 0 && isLoading === false) {
-      console.log('getSnapshot');
       dispatch(getSnapshot());
       //need to handle ERR_CONNECTION_TIMED_OUT
     }
-    return () => console.log('unmount');
-  }, [dispatch, isLoading, lastUpdateId, sendJsonMessage]);
+  }, [
+    dispatch,
+    sendJsonMessage,
+    getWebSocket,
+    readyState,
+    isLoading,
+    lastUpdateId,
+  ]);
 
   const widget = (
     <Layout
