@@ -24,24 +24,23 @@ const ColumnContainer = (props) => {
   };
 
   const columnConstructor = (arr, type) => {
-    if (arr !== null) {
-      const slicedArr = arr.slice(0, 7);
-      return slicedArr.map((element) => {
-        const price = parseFloat(element[0]);
-        const amount = parseFloat(element[1]);
-        const max = findMax(slicedArr);
-        const barLength = (amount / max) * 100;
-        return (
-          <Item
-            key={uniqid()}
-            price={formatToCurrency(price)}
-            amount={amount.toFixed(5)}
-            isAsk={type}
-            barLength={barLength < 1 ? 1 : barLength}
-          />
-        );
-      });
-    }
+    const slicedArr = arr.slice(0, 7);
+
+    return slicedArr.map((element) => {
+      const price = parseFloat(element[0]);
+      const amount = parseFloat(element[1]);
+      const max = findMax(slicedArr);
+      const barLength = (amount / max) * 100;
+      return (
+        <Item
+          key={uniqid()}
+          price={formatToCurrency(price)}
+          amount={amount.toFixed(5)}
+          isAsk={type}
+          barLength={barLength < 1 ? 1 : barLength}
+        />
+      );
+    });
   };
 
   const bidsTable = columnConstructor(bids, false);
