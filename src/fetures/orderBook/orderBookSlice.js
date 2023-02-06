@@ -28,9 +28,9 @@ export const orderBookSlice = createSlice({
   initialState,
   reducers: {
     resetOrderBookState: () => initialState,
-    processUpdate: (state, action) => {
+    updateSnapshotId: (state, action) => {
       console.log(action.payload);
-      state.lastUpdateId = action.payload.u;
+      state.lastUpdateId = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -53,7 +53,7 @@ export const orderBookSlice = createSlice({
   },
 });
 
-export const { resetOrderBookState, processUpdate } = orderBookSlice.actions;
+export const { resetOrderBookState, updateSnapshotId } = orderBookSlice.actions;
 export default orderBookSlice.reducer;
 
 // // update logic

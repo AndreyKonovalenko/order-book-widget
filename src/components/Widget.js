@@ -12,7 +12,7 @@ import Line from './orderbook/dataTable/Line';
 import {
   getSnapshot,
   resetOrderBookState,
-  processUpdate,
+  updateSnapshotId,
 } from '../fetures/orderBook/orderBookSlice';
 import { setClosePrice } from '../fetures/closePrice/closePriceSlice';
 
@@ -56,14 +56,14 @@ const Widget = () => {
         response.data.u >= lastUpdateId + 1 &&
         response.data.U <= lastUpdateId + 1
       ) {
-        dispatch(processUpdate(response.data));
+        dispatch(updateSnapshotId(response.data.u));
         console.log(response.data);
       } else {
         console.log('update is older than snaphsot!');
       }
       // step 6: While listening to the stream, each new event's U should be equal to the previous event's u+1.
       if (lastUpdateId !== 0 && response.data.U === lastUpdateId + 1) {
-        console.log(lastUpdateId !== 0 && response.data.U === lastUpdateId + 1);
+        dispatch(updateSnapshotId(response.data.u));
       } else {
         dispatch(resetOrderBookState());
         console.log('Snapshout out of sync, reset orderBook state');
@@ -92,6 +92,8 @@ const Widget = () => {
       // step 3: Get a depth snapshot from https://api.binance.com/api/v3/depth?symbol=BNBBTC&limit=1000
       dispatch(getSnapshot());
       //need to handle ERR_CONNECTION_TIMED_OUT
+    } else {
+      console.log('order book is sync');
     }
     return () => console.log('unmount');
   }, [
