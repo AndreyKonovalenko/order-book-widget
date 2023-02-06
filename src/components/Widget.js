@@ -1,16 +1,20 @@
-import React, { useEffect } from "react";
-import useWebSocket from "react-use-websocket";
-import { useSelector, useDispatch } from "react-redux";
-import useDeviceDetect from "../hooks/useDeviceDetect";
-import Header from "./orderbook/Header";
-import Layout from "./Layout";
-import LastSell from "./orderbook/dataTable/LastSell";
-import ColumnContainer from "./orderbook/dataTable/ColumnContainer";
-import DataTable from "./orderbook/dataTable/DataTable";
-import OrderBook from "./orderbook/OrderBook";
-import Line from "./orderbook/dataTable/Line";
-import { getSnapshot } from "../fetures/orderBook/orderBookSlice";
-import { setClosePrice } from "../fetures/closePrice/closePriceSlice";
+import React, { useEffect } from 'react';
+import useWebSocket from 'react-use-websocket';
+import { useSelector, useDispatch } from 'react-redux';
+import useDeviceDetect from '../hooks/useDeviceDetect';
+import Header from './orderbook/Header';
+import Layout from './Layout';
+import LastSell from './orderbook/dataTable/LastSell';
+import ColumnContainer from './orderbook/dataTable/ColumnContainer';
+import DataTable from './orderbook/dataTable/DataTable';
+import OrderBook from './orderbook/OrderBook';
+import Line from './orderbook/dataTable/Line';
+import {
+  getSnapshot,
+  resetOrderBookState,
+  processUpdate,
+} from '../fetures/orderBook/orderBookSlice';
+import { setClosePrice } from '../fetures/closePrice/closePriceSlice';
 
 const MomoizedColumnContainer = React.memo(ColumnContainer);
 //this is my implementation of managing data in local order book from Binance  exchange via websocket stream
@@ -21,10 +25,10 @@ const MomoizedColumnContainer = React.memo(ColumnContainer);
 // I use combined stream via /stream?streams instead of single raw stream /ws/bnbbtc@depth
 // this is due to the need to listen to the kline_1s stream for displaing Last Sell price
 // the close price from kline_1s data stream is taken for the Last Sell pirce to be displayed
-const endpoint = "wss://stream.binance.com:9443/stream?streams=";
+const endpoint = 'wss://stream.binance.com:9443/stream?streams=';
 
 // step 2: Buffer the events you receive from the stream.
-// Step 2, the buffering, is done by the browser by default automaticly
+// the buffering, is done by the browser
 
 const Widget = () => {
   const dispatch = useDispatch();
@@ -34,30 +38,45 @@ const Widget = () => {
   );
   const { closePrice } = useSelector((state) => state.closePrice);
   const { sendJsonMessage, getWebSocket, readyState } = useWebSocket(endpoint, {
-    onOpen: () => console.log("opened"),
-    onClose: () => console.log("WebSocket connection closed."),
+    onOpen: () => console.log('opened'),
+    onClose: () => console.log('WebSocket connection closed.'),
     shouldReconnect: (closeEvent) => true,
     onMessage: (event) => processMessages(event),
   });
+
   const processMessages = (event) => {
     const response = JSON.parse(event.data);
-    if (response.stream === "btcusdt@kline_1s") {
+    if (response.stream === 'btcusdt@kline_1s') {
       dispatch(setClosePrice(response.data.k.c));
     }
-    if (response.stream === "btcusdt@depth") {
+    if (response.stream === 'btcusdt@depth') {
       // step 4: Drop any event where u is <= lastUpdateId in the snapshot.
-      if (response.data.u > lastUpdateId) {
+      // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
+      if (
+        response.data.u >= lastUpdateId + 1 &&
+        response.data.U <= lastUpdateId + 1
+      ) {
+        dispatch(processUpdate(response.data));
         console.log(response.data);
+      } else {
+        console.log('update is older than snaphsot!');
+      }
+      // step 6: While listening to the stream, each new event's U should be equal to the previous event's u+1.
+      if (lastUpdateId !== 0 && response.data.U === lastUpdateId + 1) {
+        console.log(lastUpdateId !== 0 && response.data.U === lastUpdateId + 1);
+      } else {
+        dispatch(resetOrderBookState());
+        console.log('Snapshout out of sync, reset orderBook state');
       }
     }
   };
 
   useEffect(() => {
-    console.log("mount");
+    console.log('mount');
     const connect = () => {
       const subscribeMessage = {
-        method: "SUBSCRIBE",
-        params: ["btcusdt@depth", "btcusdt@kline_1s"],
+        method: 'SUBSCRIBE',
+        params: ['btcusdt@depth', 'btcusdt@kline_1s'],
         id: 1,
       };
       sendJsonMessage(subscribeMessage);
@@ -74,7 +93,7 @@ const Widget = () => {
       dispatch(getSnapshot());
       //need to handle ERR_CONNECTION_TIMED_OUT
     }
-    return () => console.log("unmount");
+    return () => console.log('unmount');
   }, [
     dispatch,
     sendJsonMessage,
@@ -88,8 +107,7 @@ const Widget = () => {
     <Layout
       isMobile={isMobile}
       isLandscape={isLandscape}
-      isMobileDevice={isMobileDevice}
-    >
+      isMobileDevice={isMobileDevice}>
       <OrderBook isMobile={isMobile}>
         <Header />
         <DataTable>

@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import orderBookService from "./orderBookService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import orderBookService from './orderBookService';
 
 const initialState = {
   lastUpdateId: 0,
@@ -8,10 +8,10 @@ const initialState = {
   isError: false,
   isSuccess: false,
   isLoading: false,
-  message: "",
+  message: '',
 };
 
-export const getSnapshot = createAsyncThunk("getSnapshot", async (thunkAPI) => {
+export const getSnapshot = createAsyncThunk('getSnapshot', async (thunkAPI) => {
   try {
     return await orderBookService.getSnapshot();
   } catch (error) {
@@ -24,9 +24,15 @@ export const getSnapshot = createAsyncThunk("getSnapshot", async (thunkAPI) => {
 });
 
 export const orderBookSlice = createSlice({
-  name: "orderbook",
+  name: 'orderbook',
   initialState,
-  reducers: { resetOrderbookState: () => initialState },
+  reducers: {
+    resetOrderBookState: () => initialState,
+    processUpdate: (state, action) => {
+      console.log(action.payload);
+      state.lastUpdateId = action.payload.u;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getSnapshot.pending, (state) => {
@@ -47,7 +53,7 @@ export const orderBookSlice = createSlice({
   },
 });
 
-export const { resetOrderBookState } = orderBookSlice.actions;
+export const { resetOrderBookState, processUpdate } = orderBookSlice.actions;
 export default orderBookSlice.reducer;
 
 // // update logic
