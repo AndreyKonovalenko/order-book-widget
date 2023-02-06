@@ -39,7 +39,6 @@ export const orderBookSlice = createSlice({
         state.bids = action.payload.bids;
         state.asks = action.payload.asks;
       })
-
       .addCase(getSnapshot.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
@@ -50,3 +49,17 @@ export const orderBookSlice = createSlice({
 
 export const { resetOrderBookState } = orderBookSlice.actions;
 export default orderBookSlice.reducer;
+
+// // update logic
+//  state.quiz.questions.map((element) => {
+//     if (element._id === action.payload._id) {
+//       element = action.payload;
+//     }
+//     return element;
+//   }),
+// };
+
+// // delete logic
+// state.quiz.questions = state.quiz.questions.filter(
+//   (element) => element._id !== action.payload.id
+// );
