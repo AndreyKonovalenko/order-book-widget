@@ -1,5 +1,13 @@
+import { useEffect } from "react";
+import uniqid from "uniqid";
+
+import Column from "./Column";
+import Item from "./Item";
+
+import { formatToCurrency, findMax } from "../../../utils/utils";
+
 const ColumnContainer = (props) => {
-  const { children } = props;
+  const { bids, asks } = props;
   const styles = {
     container: {
       display: "flex",
@@ -14,7 +22,44 @@ const ColumnContainer = (props) => {
       flexGrow: "0",
     },
   };
-  return <div style={styles.container}>{children}</div>;
+
+  const columnConstructor = (arr, type) => {
+    if (arr !== null) {
+      const slicedArr = arr.slice(0, 7);
+      return slicedArr.map((element) => {
+        const price = parseFloat(element[0]);
+        const amount = parseFloat(element[1]);
+        const max = findMax(slicedArr);
+        const barLength = (amount / max) * 100;
+        return (
+          <Item
+            key={uniqid()}
+            price={formatToCurrency(price)}
+            amount={amount.toFixed(5)}
+            isAsk={type}
+            barLength={barLength < 1 ? 1 : barLength}
+          />
+        );
+      });
+    }
+  };
+
+  const bidsTable = columnConstructor(bids, false);
+  const asksTable = columnConstructor(asks, true);
+
+  useEffect(() => {
+    console.log("column mount");
+    return () => {
+      "column unmount";
+    };
+  });
+
+  return (
+    <div style={styles.container}>
+      <Column>{bidsTable}</Column>
+      <Column>{asksTable}</Column>
+    </div>
+  );
 };
 
 export default ColumnContainer;

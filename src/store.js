@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import orderbookReducer from "./fetures/orderbook/orderbookSlice";
+import orderBookReducer from "./fetures/orderBook/orderBookSlice";
 import closePriceSlice from "./fetures/closePrice/closePriceSlice";
 
 export default configureStore({
   reducer: {
-    orderbook: orderbookReducer,
+    orderBook: orderBookReducer,
     closePrice: closePriceSlice,
   },
 });
