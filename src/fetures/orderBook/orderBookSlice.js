@@ -1,17 +1,33 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import orderBookService from './orderBookService';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import orderBookService from "./orderBookService";
 
 const initialState = {
   lastUpdateId: 0,
-  bids: null,
-  asks: null,
+  bids: [
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+  ],
+  asks: [
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+  ],
   isError: false,
   isSuccess: false,
   isLoading: false,
-  message: '',
+  message: "",
 };
 
-export const getSnapshot = createAsyncThunk('getSnapshot', async (thunkAPI) => {
+export const getSnapshot = createAsyncThunk("getSnapshot", async (thunkAPI) => {
   try {
     return await orderBookService.getSnapshot();
   } catch (error) {
@@ -24,7 +40,7 @@ export const getSnapshot = createAsyncThunk('getSnapshot', async (thunkAPI) => {
 });
 
 export const orderBookSlice = createSlice({
-  name: 'orderbook',
+  name: "orderbook",
   initialState,
   reducers: {
     resetOrderBookState: () => initialState,

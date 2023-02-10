@@ -14,6 +14,7 @@ import {
   resetOrderBookState,
   updateSnapshotId,
 } from "../fetures/orderBook/orderBookSlice";
+import { addToBuffer, dropEvent } from "../fetures/buffer/bufferSlice";
 import { setClosePrice } from "../fetures/closePrice/closePriceSlice";
 
 const MomoizedColumnContainer = React.memo(ColumnContainer);
@@ -36,6 +37,7 @@ const Widget = () => {
   const { bids, asks, isLoading, lastUpdateId } = useSelector(
     (state) => state.orderBook
   );
+  const { buffer } = useSelector((state) => state.buffer);
   const { closePrice } = useSelector((state) => state.closePrice);
   const { sendJsonMessage, getWebSocket, readyState } = useWebSocket(endpoint, {
     onOpen: () => console.log("opened"),
@@ -50,22 +52,28 @@ const Widget = () => {
       dispatch(setClosePrice(response.data.k.c));
     }
     if (response.stream === "btcusdt@depth") {
+      // step 2: Buffer events you recieve from the stream.
+      dispatch(addToBuffer(response.data));
       // step 4: Drop any event where u is <= lastUpdateId in the snapshot.
+      console.log(response.data.u <= lastUpdateId, "need to drop");
+      if (response.data.u <= lastUpdateId) {
+        dispatch(dropEvent(lastUpdateId));
+      }
       // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
       if (
         response.data.u >= lastUpdateId + 1 &&
         response.data.U <= lastUpdateId + 1
       ) {
+        console.log(buffer);
         dispatch(updateSnapshotId(response.data.u));
-        console.log(response.data);
+        //     console.log(response.data);
       } else {
-        console.log("update is older than snaphsot!");
+        //   console.log("update is older than snaphsot!");
       }
       // step 6: While listening to the stream, each new event's U should be equal to the previous event's u+1.
       if (lastUpdateId !== 0 && response.data.U === lastUpdateId + 1) {
-        dispatch(updateSnapshotId(response.data.u));
+        //    dispatch(updateSnapshotId(response.data.u));
       } else {
-        dispatch(resetOrderBookState());
         console.log("Snapshout out of sync, reset orderBook state");
       }
     }
@@ -87,8 +95,8 @@ const Widget = () => {
         connect();
       }
     }
-    console.log(lastUpdateId === 0 && isLoading === false);
-    if (lastUpdateId === 0 && isLoading === false) {
+
+    if (lastUpdateId === 0 && isLoading === false && readyState === 1) {
       // step 3: Get a depth snapshot from https://api.binance.com/api/v3/depth?symbol=BNBBTC&limit=1000
       dispatch(getSnapshot());
       //need to handle ERR_CONNECTION_TIMED_OUT
