@@ -13,8 +13,10 @@ export const bufferSlice = createSlice({
     },
     dropEvent: (state, action) => {
       state.buffer = state.buffer.filter((element) => {
+        console.log(element.u, action.payload);
         console.log('drop any updates older than the snapshot');
-        return element.u > action.payload.lastUpdateId;
+
+        return element.u > action.payload;
       });
     },
   },

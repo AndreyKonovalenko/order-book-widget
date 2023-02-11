@@ -62,34 +62,34 @@ const Widget = () => {
 
       // step 4: Drop any event where u is <= lastUpdateId in the snapshot.
       if (buffer.length > 0 && lastUpdateId !== 0) {
+        console.log(lastUpdateId);
         dispatch(dropEvent(lastUpdateId));
         // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
         procceUpdates(buffer, lastUpdateId);
       }
 
-      // step 6: While listening to the stream, each new event's U should be equal to the previous event's u+1.
-      if (lastUpdateId !== 0 && response.data.U === lastUpdateId + 1) {
-        console.log('Snapshout is sync');
-      } else {
-        console.log('Snapshout out of sync');
-      }
+      // // step 6: While listening to the stream, each new event's U should be equal to the previous event's u+1.
+      // if (lastUpdateId !== 0 && response.data.U === lastUpdateId + 1) {
+      //   console.log('Snapshout is sync');
+      // } else {
+      //   console.log('Snapshout out of sync');
+      // }
     }
   };
 
   const procceUpdates = (buffer, lastUpdateId) => {
     let newLastUpdateId = lastUpdateId;
-    for (const event in buffer) {
+    for (const event of buffer) {
       if (event.u >= newLastUpdateId + 1 && event.U <= newLastUpdateId + 1) {
         console.log('proccess event');
         newLastUpdateId = event.u;
       }
     }
-    console.log('new last upadate ID', newLastUpdateId);
     dispatch(updateSnapshotId(newLastUpdateId));
   };
 
   useEffect(() => {
-    // console.log("mount");
+    console.log('mount');
     const connect = () => {
       const subscribeMessage = {
         method: 'SUBSCRIBE',
