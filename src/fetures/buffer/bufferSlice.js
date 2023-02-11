@@ -1,10 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   buffer: [],
 };
 
 export const bufferSlice = createSlice({
-  name: "buffer",
+  name: 'buffer',
   initialState,
   reducers: {
     resetBufferState: () => initialState,
@@ -13,7 +13,7 @@ export const bufferSlice = createSlice({
     },
     dropEvent: (state, action) => {
       state.buffer = state.buffer.filter((element) => {
-        console.log(element.u, action.payload.lastUpdateId);
+        console.log('drop any updates older than the snapshot');
         return element.u > action.payload.lastUpdateId;
       });
     },
