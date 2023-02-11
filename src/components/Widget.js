@@ -74,6 +74,7 @@ const Widget = () => {
           console.log('Snapshout is sync');
         } else {
           console.log('Snapshout out of sync');
+          //reset buffer state and order book state
         }
       }
     }
