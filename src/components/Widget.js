@@ -37,7 +37,7 @@ const Widget = () => {
   const { bids, asks, isLoading, lastUpdateId } = useSelector(
     (state) => state.orderBook
   );
-  const { buffer } = useSelector((state) => state.buffer);
+  const { buffer, u } = useSelector((state) => state.buffer);
   const { closePrice } = useSelector((state) => state.closePrice);
   const { sendJsonMessage, getWebSocket, readyState } = useWebSocket(endpoint, {
     onOpen: () => console.log('opened'),
@@ -60,20 +60,22 @@ const Widget = () => {
         dispatch(getSnapshot());
       }
 
-      // step 4: Drop any event where u is <= lastUpdateId in the snapshot.
-      if (buffer.length > 0 && lastUpdateId !== 0) {
-        console.log(lastUpdateId);
-        dispatch(dropEvent(lastUpdateId));
-        // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
-        procceUpdates(buffer, lastUpdateId);
-      }
-
-      // // step 6: While listening to the stream, each new event's U should be equal to the previous event's u+1.
-      // if (lastUpdateId !== 0 && response.data.U === lastUpdateId + 1) {
-      //   console.log('Snapshout is sync');
-      // } else {
-      //   console.log('Snapshout out of sync');
+      // // step 4: Drop any event where u is <= lastUpdateId in the snapshot.
+      // if (buffer.length > 0 && lastUpdateId !== 0) {
+      //   dispatch(dropEvent(lastUpdateId));
       // }
+      // // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
+      // procceUpdates(buffer, lastUpdateId);
+
+      // step 6: While listening to the stream, each new event's U should be equal to the previous event's u+1.
+      console.log(response.data.U, response.data.u, u);
+      if (u) {
+        if (response.data.U === u + 1) {
+          console.log('Snapshout is sync');
+        } else {
+          console.log('Snapshout out of sync');
+        }
+      }
     }
   };
 
