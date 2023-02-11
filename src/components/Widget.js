@@ -54,18 +54,18 @@ const Widget = () => {
     if (response.stream === 'btcusdt@depth') {
       // step 2: Buffer events you recieve from the stream.
       dispatch(addToBuffer(response.data));
-
       // step 3: Get a depth snapshot from https://api.binance.com/api/v3/depth?symbol=BNBBTC&limit=1000
-      if (lastUpdateId === 0 && isLoading === false && readyState === 1) {
+      if (lastUpdateId === 0 && isLoading === false) {
         dispatch(getSnapshot());
       }
 
       // // step 4: Drop any event where u is <= lastUpdateId in the snapshot.
-      // if (buffer.length > 0 && lastUpdateId !== 0) {
-      //   dispatch(dropEvent(lastUpdateId));
-      // }
-      // // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
-      // procceUpdates(buffer, lastUpdateId);
+      if (buffer.length > 0) {
+        dispatch(dropEvent(lastUpdateId));
+      }
+
+      // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
+      procceUpdates(buffer, lastUpdateId);
 
       // step 6: While listening to the stream, each new event's U should be equal to the previous event's u+1.
       console.log(response.data.U, response.data.u, u);
@@ -82,6 +82,7 @@ const Widget = () => {
 
   const procceUpdates = (buffer, lastUpdateId) => {
     let newLastUpdateId = lastUpdateId;
+
     for (const event of buffer) {
       if (event.u >= newLastUpdateId + 1 && event.U <= newLastUpdateId + 1) {
         console.log('proccess event');
