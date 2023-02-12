@@ -11,17 +11,20 @@ export const bufferSlice = createSlice({
     resetBufferState: () => initialState,
     addToBuffer: (state, action) => {
       state.buffer = [...state.buffer, action.payload];
+    },
+    setFinalUpdateIDinEvent: (state, action) => {
       state.u = action.payload.u;
     },
-    dropEvent: (state, action) => {
-      state.buffer = state.buffer.filter((element) => {
-        console.log(element.u, action.payload);
-        console.log('drop any updates older than the snapshot');
-        return element.u > action.payload;
-      });
+    clearBuffer: (state) => {
+      state.buffer = [];
     },
   },
 });
 
-export const { resetBufferState, addToBuffer, dropEvent } = bufferSlice.actions;
+export const {
+  resetBufferState,
+  addToBuffer,
+  setFinalUpdateIDinEvent,
+  clearBuffer,
+} = bufferSlice.actions;
 export default bufferSlice.reducer;

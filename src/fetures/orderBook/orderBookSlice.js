@@ -45,7 +45,6 @@ export const orderBookSlice = createSlice({
   reducers: {
     resetOrderBookState: () => initialState,
     updateSnapshotId: (state, action) => {
-      console.log(action.payload);
       state.lastUpdateId = action.payload;
     },
   },

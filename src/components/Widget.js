@@ -14,7 +14,11 @@ import {
   resetOrderBookState,
   updateSnapshotId,
 } from '../fetures/orderBook/orderBookSlice';
-import { addToBuffer, dropEvent } from '../fetures/buffer/bufferSlice';
+import {
+  addToBuffer,
+  setFinalUpdateIDinEvent,
+  clearBuffer,
+} from '../fetures/buffer/bufferSlice';
 import { setClosePrice } from '../fetures/closePrice/closePriceSlice';
 
 const MomoizedColumnContainer = React.memo(ColumnContainer);
@@ -52,37 +56,43 @@ const Widget = () => {
       dispatch(setClosePrice(response.data.k.c));
     }
     if (response.stream === 'btcusdt@depth') {
-      // step 2: Buffer events you recieve from the stream.
-      dispatch(addToBuffer(response.data));
+      dispatch(setFinalUpdateIDinEvent(response.data));
+      if (lastUpdateId === 0) {
+        // step 2: Buffer events you recieve from the stream.
+        // Buffer evenst durearing snapshot loading
+        dispatch(addToBuffer(response.data));
+      }
       // step 3: Get a depth snapshot from https://api.binance.com/api/v3/depth?symbol=BNBBTC&limit=1000
       if (lastUpdateId === 0 && isLoading === false) {
         dispatch(getSnapshot());
       }
 
-      // // step 4: Drop any event where u is <= lastUpdateId in the snapshot.
-      if (buffer.length > 0) {
-        dispatch(dropEvent(lastUpdateId));
+      if (lastUpdateId > 0) {
+        // snyc cnapshot with uprocessed events
+        if (buffer.length > 0) {
+          proccessBuffer(buffer, lastUpdateId);
+          dispatch(clearBuffer());
+        }
+        // step 4: Drop any event where u is <= lastUpdateId in the snapshot.
+        if (response.data.u > lastUpdateId) {
+          proccessUpdate(response.data);
+        }
       }
-
-      // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
-      procceUpdates(buffer, lastUpdateId);
-
       // step 6: While listening to the stream, each new event's U should be equal to the previous event's u+1.
-      console.log(response.data.U, response.data.u, u);
       if (u) {
         if (response.data.U === u + 1) {
-          console.log('Snapshout is sync');
+          console.log('updates is sync');
         } else {
-          console.log('Snapshout out of sync');
+          console.log('updates out of sync');
           //reset buffer state and order book state
         }
       }
     }
   };
 
-  const procceUpdates = (buffer, lastUpdateId) => {
+  const proccessBuffer = (buffer, lastUpdateId) => {
     let newLastUpdateId = lastUpdateId;
-
+    // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
     for (const event of buffer) {
       if (event.u >= newLastUpdateId + 1 && event.U <= newLastUpdateId + 1) {
         console.log('proccess event');
@@ -90,6 +100,11 @@ const Widget = () => {
       }
     }
     dispatch(updateSnapshotId(newLastUpdateId));
+  };
+
+  const proccessUpdate = (update) => {
+    dispatch(updateSnapshotId(update.u));
+    console.log('update processed');
   };
 
   useEffect(() => {
