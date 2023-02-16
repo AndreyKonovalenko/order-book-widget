@@ -19,32 +19,39 @@ export const manageOrderBook = (
   type
 ) => {
   let newArr = snapshotPriceArr.map((element) => element);
+  let sorted = true;
   if (depthUpdatePriceArr.length > 0) {
     depthUpdatePriceArr.forEach((update) => {
       const index = snapshotPriceArr.findIndex(
         (element) => element[0] === update[0]
       );
+      console.log(index);
       if (index !== -1) {
-        if (update[1] === 0) {
+        if (update[1] === "0") {
           // price level exists, quantity set to 0, remove from list
           newArr.splice(index, 1);
         }
-        if (update[1] > 0) {
-          //price level already exists, different quantity
+        //price level already exists, different quantity
+        else {
           newArr[index][1] = update[1];
         }
       }
+
       if (index === -1) {
         // new price level, add to list
         newArr.push(update);
+        sorted = false;
       }
     });
-    if (type === "bids") {
-      newArr.sort((a, b) => b[0] - a[0]);
-    }
-    if (type === "asks") {
-      newArr.sort((a, b) => a[0] - b[0]);
+    if (sorted === false) {
+      if (type === "bids") {
+        newArr.sort((a, b) => b[0] - a[0]);
+      }
+      if (type === "asks") {
+        newArr.sort((a, b) => a[0] - b[0]);
+      }
     }
   }
+  console.log(newArr);
   return newArr;
 };
