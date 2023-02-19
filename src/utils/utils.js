@@ -19,7 +19,7 @@ export const manageOrderBook = (
   type
 ) => {
   //console.log(snapshotPriceArr, depthUpdatePriceArr, type);
-  let newArr = snapshotPriceArr.map((element) => element);
+  const newArr = snapshotPriceArr.map((element) => element);
   let sorted = true;
   if (depthUpdatePriceArr.length > 0) {
     depthUpdatePriceArr.forEach((update) => {
