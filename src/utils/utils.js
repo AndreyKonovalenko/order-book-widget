@@ -13,13 +13,19 @@ export const findMax = (arr) => {
   return Math.max(...amountArr);
 };
 
+const clone = (arr) => {
+  return arr.map((element) => {
+    return element.slice();
+  });
+};
+
 export const manageOrderBook = (
   snapshotPriceArr,
   depthUpdatePriceArr,
   type
 ) => {
-  //console.log(snapshotPriceArr, depthUpdatePriceArr, type);
-  const newArr = snapshotPriceArr.map((element) => element);
+  console.log(snapshotPriceArr, depthUpdatePriceArr, type);
+  const newArr = clone(snapshotPriceArr);
   let sorted = true;
   if (depthUpdatePriceArr.length > 0) {
     depthUpdatePriceArr.forEach((update) => {
@@ -33,7 +39,10 @@ export const manageOrderBook = (
         }
         //price level already exists, different quantity
         else {
+          console.log(newArr[index]);
           newArr[index][1] = update[1];
+          console.log(newArr[index]);
+          console.log(snapshotPriceArr[index]);
         }
       }
 
@@ -52,6 +61,6 @@ export const manageOrderBook = (
       }
     }
   }
-  console.log(snapshotPriceArr);
+  console.log(snapshotPriceArr, type);
   return newArr;
 };
