@@ -1,6 +1,6 @@
 export const formatToCurrency = (num) => {
   return num.toLocaleString(
-    'en-US',
+    "en-US",
     { minimumFractionDigits: 2 },
     {
       maximumFractionDigits: 2,
@@ -24,7 +24,6 @@ export const manageOrderBook = (
   depthUpdatePriceArr,
   type
 ) => {
-  console.log(snapshotPriceArr, depthUpdatePriceArr, type);
   const newArr = clone(snapshotPriceArr);
   let sorted = true;
   if (depthUpdatePriceArr.length > 0) {
@@ -33,34 +32,30 @@ export const manageOrderBook = (
         (element) => element[0] === update[0]
       );
       if (index !== -1) {
-        if (update[1] === '0') {
+        if (update[1] === "0") {
           // price level exists, quantity set to 0, remove from list
           newArr.splice(index, 1);
         }
         //price level already exists, different quantity
         else {
-          console.log(newArr[index]);
           newArr[index][1] = update[1];
-          console.log(newArr[index]);
-          console.log(snapshotPriceArr[index]);
         }
       }
 
-      if (index === -1 && update[1] !== '0') {
+      if (index === -1 && update[1] !== "0") {
         // new price level, add to list
         newArr.push(update);
         sorted = false;
       }
     });
     if (sorted === false) {
-      if (type === 'bids') {
+      if (type === "bids") {
         newArr.sort((a, b) => b[0] - a[0]);
       }
-      if (type === 'asks') {
+      if (type === "asks") {
         newArr.sort((a, b) => a[0] - b[0]);
       }
     }
   }
-  console.log(snapshotPriceArr, type);
   return newArr;
 };
