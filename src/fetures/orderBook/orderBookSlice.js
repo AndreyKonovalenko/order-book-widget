@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import orderBookService from "./orderBookService";
+import { manageOrderBook } from "../../utils/utils";
 
 const initialState = {
   lastUpdateId: 0,
@@ -44,8 +45,11 @@ export const orderBookSlice = createSlice({
   initialState,
   reducers: {
     resetOrderBookState: () => initialState,
-    updateSnapshotId: (state, action) => {
-      state.lastUpdateId = action.payload;
+    updateSnapshot: (state, action) => {
+      console.log(action.payload);
+      state.lastUpdateId = action.payload.u;
+      state.bids = manageOrderBook(state.bids, action.payload.b, "bids");
+      state.asks = manageOrderBook(state.asks, action.payload.a, "asks");
     },
   },
   extraReducers: (builder) => {
@@ -68,7 +72,7 @@ export const orderBookSlice = createSlice({
   },
 });
 
-export const { resetOrderBookState, updateSnapshotId } = orderBookSlice.actions;
+export const { resetOrderBookState, updateSnapshot } = orderBookSlice.actions;
 export default orderBookSlice.reducer;
 
 // // update logic

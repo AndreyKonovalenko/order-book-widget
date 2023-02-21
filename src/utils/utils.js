@@ -26,7 +26,8 @@ export const manageOrderBook = (
 ) => {
   const newArr = clone(snapshotPriceArr);
   let sorted = true;
-  if (depthUpdatePriceArr.length > 0) {
+  console.log(depthUpdatePriceArr);
+  if (depthUpdatePriceArr.length > 0 && depthUpdatePriceArr !== undefined) {
     depthUpdatePriceArr.forEach((update) => {
       const index = snapshotPriceArr.findIndex(
         (element) => element[0] === update[0]
