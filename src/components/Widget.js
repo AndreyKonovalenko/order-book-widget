@@ -92,15 +92,14 @@ const Widget = () => {
 
   const proccessBuffer = (buffer, lastUpdateId) => {
     console.log("process buffer");
-    // let newLastUpdateId = lastUpdateId;
-    // // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
-    // for (const event of buffer) {
-    //   if (event.u >= newLastUpdateId + 1 && event.U <= newLastUpdateId + 1) {
-    //     console.log("proccess event");
-    //     newLastUpdateId = event.u;
-    //   }
-    // }
-    // dispatch(updateSnapshot(newLastUpdateId));
+    let newLastUpdateId = lastUpdateId;
+    // step 5: The first processed event should have U <= lastUpdateId+1 AND u >= lastUpdateId+1.
+    for (const event of buffer) {
+      if (event.u >= newLastUpdateId + 1 && event.U <= newLastUpdateId + 1) {
+        dispatch(updateSnapshot(event));
+        newLastUpdateId = event.u;
+      }
+    }
   };
 
   const proccessUpdate = (update) => {

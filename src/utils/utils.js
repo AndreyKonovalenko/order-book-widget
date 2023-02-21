@@ -27,25 +27,25 @@ export const manageOrderBook = (
   const newArr = clone(snapshotPriceArr);
   let sorted = true;
   console.log(depthUpdatePriceArr);
-  if (depthUpdatePriceArr.length > 0 && depthUpdatePriceArr !== undefined) {
+  if (depthUpdatePriceArr.length > 0) {
     depthUpdatePriceArr.forEach((update) => {
       const index = snapshotPriceArr.findIndex(
         (element) => element[0] === update[0]
       );
       if (index !== -1) {
-        if (update[1] === "0") {
+        if (update[1] === "0.00000000") {
           // price level exists, quantity set to 0, remove from list
           newArr.splice(index, 1);
         }
         //price level already exists, different quantity
         else {
+          console.log(update[1], update);
           newArr[index][1] = update[1];
         }
       }
 
-      if (index === -1 && update[1] !== "0") {
+      if (index === -1 && update[1] !== "0.00000000") {
         // new price level, add to list
-        newArr.push(update);
         sorted = false;
       }
     });
