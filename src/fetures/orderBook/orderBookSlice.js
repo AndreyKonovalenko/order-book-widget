@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import orderBookService from "./orderBookService";
-import { manageOrderBook } from "../../utils/utils";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import orderBookService from './orderBookService';
+import { manageOrderBook } from '../../utils/utils';
 
 const initialState = {
   lastUpdateId: 0,
@@ -25,10 +25,10 @@ const initialState = {
   isError: false,
   isSuccess: false,
   isLoading: false,
-  message: "",
+  message: '',
 };
 
-export const getSnapshot = createAsyncThunk("getSnapshot", async (thunkAPI) => {
+export const getSnapshot = createAsyncThunk('getSnapshot', async (thunkAPI) => {
   try {
     return await orderBookService.getSnapshot();
   } catch (error) {
@@ -41,15 +41,14 @@ export const getSnapshot = createAsyncThunk("getSnapshot", async (thunkAPI) => {
 });
 
 export const orderBookSlice = createSlice({
-  name: "orderbook",
+  name: 'orderbook',
   initialState,
   reducers: {
     resetOrderBookState: () => initialState,
     updateSnapshot: (state, action) => {
-      console.log(action.payload);
       state.lastUpdateId = action.payload.u;
-      state.bids = manageOrderBook(state.bids, action.payload.b, "bids");
-      state.asks = manageOrderBook(state.asks, action.payload.a, "asks");
+      state.bids = manageOrderBook(state.bids, action.payload.b, 'bids');
+      state.asks = manageOrderBook(state.asks, action.payload.a, 'asks');
     },
   },
   extraReducers: (builder) => {
@@ -74,17 +73,3 @@ export const orderBookSlice = createSlice({
 
 export const { resetOrderBookState, updateSnapshot } = orderBookSlice.actions;
 export default orderBookSlice.reducer;
-
-// // update logic
-//  state.quiz.questions.map((element) => {
-//     if (element._id === action.payload._id) {
-//       element = action.payload;
-//     }
-//     return element;
-//   }),
-// };
-
-// // delete logic
-// state.quiz.questions = state.quiz.questions.filter(
-//   (element) => element._id !== action.payload.id
-// );

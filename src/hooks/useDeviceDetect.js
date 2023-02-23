@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 const getIsMobile = () => window.innerWidth <= 600;
-const getIsRetina = () => window.matchMedia("(min-resolution: 2dppx)").matches;
+const getIsRetina = () => window.matchMedia('(min-resolution: 2dppx)').matches;
 const getIsMobileLandscape = () => window.innerHeight <= 400;
 const checkDevice = () => {
   const userAgent =
-    typeof window.navigator === "undefined" ? "" : navigator.userAgent;
+    typeof window.navigator === 'undefined' ? '' : navigator.userAgent;
   const mobile = Boolean(
     userAgent.match(
       /Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i
@@ -20,7 +20,7 @@ const useDeviceDetect = () => {
   const [isMobileDevice, setIsMobileDevice] = useState(checkDevice());
 
   useEffect(() => {
-    console.log("hook activated");
+    //  console.log("hook activated");
     const onResize = () => {
       setIsMobile(getIsMobile());
       setIsRetina(getIsRetina());
@@ -28,10 +28,10 @@ const useDeviceDetect = () => {
       setIsMobileDevice(checkDevice());
     };
 
-    window.addEventListener("resize", onResize);
+    window.addEventListener('resize', onResize);
 
     return () => {
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 

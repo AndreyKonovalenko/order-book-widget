@@ -1,25 +1,24 @@
-import { useEffect } from "react";
-import uniqid from "uniqid";
+import uniqid from 'uniqid';
 
-import Column from "./Column";
-import Item from "./Item";
+import Column from './Column';
+import Item from './Item';
 
-import { formatToCurrency, findMax } from "../../../utils/utils";
+import { formatToCurrency, findMax } from '../../../utils/utils';
 
 const ColumnContainer = (props) => {
   const { bids, asks } = props;
   const styles = {
     container: {
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "flex-start",
-      gap: "20px",
-      isolation: "isolate",
-      width: "312px",
-      height: "183px",
-      flex: "none",
-      order: "0",
-      flexGrow: "0",
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: '20px',
+      isolation: 'isolate',
+      width: '312px',
+      height: '183px',
+      flex: 'none',
+      order: '0',
+      flexGrow: '0',
     },
   };
 
@@ -45,13 +44,6 @@ const ColumnContainer = (props) => {
 
   const bidsTable = columnConstructor(bids, false);
   const asksTable = columnConstructor(asks, true);
-
-  useEffect(() => {
-    console.log("column mount");
-    return () => {
-      "column unmount";
-    };
-  });
 
   return (
     <div style={styles.container}>
