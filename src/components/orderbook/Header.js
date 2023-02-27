@@ -39,7 +39,7 @@ const Header = () => {
   return (
     <div style={styles.container}>
       <div style={styles.textContainer}>
-        <span style={styles.head0}>BTC/USDT Orderbook</span>
+        <span style={styles.head0}>BTC/USDT Orderbook </span>
       </div>
       <div style={styles.textContainer}>
         <span style={styles.head1}>
