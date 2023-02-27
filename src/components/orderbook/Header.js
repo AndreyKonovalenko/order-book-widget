@@ -33,20 +33,18 @@ const Header = () => {
       lineHeight: "116%",
       margin: "0px",
     },
-    head2: {
-      color: colors.sell,
-    },
+    head2: {},
   };
   const text = "and selling";
   return (
     <div style={styles.container}>
       <div style={styles.textContainer}>
-        <p style={styles.head0}>BTC/USDT Orderbook</p>
+        <span style={styles.head0}>BTC/USDT Orderbook</span>
       </div>
       <div style={styles.textContainer}>
-        <p style={styles.head1}>
+        <span style={styles.head1}>
           Buying <span style={styles.head2}>{text}</span>
-        </p>
+        </span>
       </div>
     </div>
   );
