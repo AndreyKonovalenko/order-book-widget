@@ -2,6 +2,8 @@
 
 Order book widget helps buyers and sellers of the crypto exchange analyse the market depth and find a profitable offer. Data is requested via the Binance API and updated in real time via WebSocket.
 
+![data_image](https://user-images.githubusercontent.com/16167616/221538801-0b3d9082-0f21-4412-835b-1a6e18afb401.gif)
+
 For managing data in local order book I use Binance 9 Steps documentation "How to manage a local order book correctly"
 https://binance-docs.github.io/apidocs/spot/en/#diff-depth-stream".
 
