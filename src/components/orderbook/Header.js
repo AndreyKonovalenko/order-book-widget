@@ -15,7 +15,6 @@ const Header = () => {
     },
     textContainer: {
       padding: "0px",
-      width: "100%",
     },
     head0: {
       fontFamily: fonts.family.main,
@@ -24,6 +23,7 @@ const Header = () => {
       color: colors.text.main,
       lineHeight: "116%",
       margin: "0px",
+      whiteSpace: "nowrap",
     },
     head1: {
       fontFamily: fonts.family.main,
@@ -32,6 +32,7 @@ const Header = () => {
       color: colors.buy,
       lineHeight: "116%",
       margin: "0px",
+      whiteSpace: "nowrap",
     },
     head2: {},
   };
@@ -39,7 +40,7 @@ const Header = () => {
   return (
     <div style={styles.container}>
       <div style={styles.textContainer}>
-        <span style={styles.head0}>BTC/USDT Orderbook </span>
+        <span style={styles.head0}>BTC/USDT Orderbook</span>
       </div>
       <div style={styles.textContainer}>
         <span style={styles.head1}>
